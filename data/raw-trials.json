@@ -1,5 +1,5 @@
 {
- "generated_from": "progress/day20/lla-*/{verifier/reward.txt, agent/hermes-session.jsonl}",
+ "generated_from": "Per-trial extraction from Hermes-harness output: reward.txt + agent/hermes-session.jsonl",
  "n_trials": 699,
  "tier1": [
   "break-filter-js-from-html",
