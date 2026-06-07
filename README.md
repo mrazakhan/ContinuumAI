@@ -1,6 +1,8 @@
 # ContinuumAI
 
-**Solving the amnesiac problem for LLM agents.** A research series on agents that compound knowledge across sessions instead of restarting from zero every time. First measured result: **+4.6 percentage points** on Terminal-Bench 2.1 with an open-weight executor and a single failure-trajectory-derived skill — no fine-tuning, no RL.
+**Solving the amnesiac problem for LLM agents.** ContinuumAI is the platform that captures the lesson from every agent session automatically, distills it into a short reusable skill file, and loads it before every related session that follows — across every developer on your team, every model in your routing layer, every quarter you keep running. No human curation step. No manual playbook maintenance. No fine-tuning. No RL. **First public measurement: +4.6 percentage points on Terminal-Bench 2.1** with an open-weight executor.
+
+This repo is the first public release: a working aggregation of the experiment data, the loop, and a three-post series introducing the platform.
 
 ## The three-post series
 
