@@ -2,8 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 """Generate the post-1 accuracy plot from data/canonical-results.json.
 
-Output: assets/post-1-accuracy.png (1200 x 700 px, 144 DPI).
+Output: assets/post-1-accuracy.png (1200 x 720 px, 144 DPI).
 Re-run any time the canonical results regenerate to keep the plot in sync.
+
+Design choices:
+- Y axis truncated at 30 (declared in the subtitle); the differences
+  between conditions are 3-19 pp and look invisible against a 0-100 scale.
+- Two-tone blue family for the skill conditions (B lighter, C darker)
+  to encode "B comes first, C is the better artifact" at a glance.
+- Frontier reference uses a hatched amber fill to signal "external,
+  for comparison" without competing visually with our bars.
+- Lift annotations live in small green pills above the skill bars so
+  the headline "+4.6 pp" reads at thumbnail size.
 
 Usage::
 
@@ -22,63 +32,102 @@ DATA = ROOT / "data"
 ASSETS = ROOT / "assets"
 ASSETS.mkdir(exist_ok=True)
 
+# Use the nicest system sans-serif available
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Helvetica Neue", "Helvetica", "Inter", "Arial", "DejaVu Sans"],
+    "axes.titlesize": 14,
+    "axes.labelsize": 11,
+})
+
+# Color palette
+COLOR_BASELINE = "#94a3b8"   # slate-400  -- neutral control
+COLOR_B        = "#60a5fa"   # blue-400   -- first skill condition
+COLOR_C        = "#1d4ed8"   # blue-700   -- best skill condition (our headline)
+COLOR_FRONTIER = "#fbbf24"   # amber-400  -- external reference
+COLOR_LIFT     = "#16a34a"   # green-600  -- positive delta pill
+COLOR_TEXT     = "#0f172a"   # slate-900
+COLOR_MUTED    = "#64748b"   # slate-500
+COLOR_GRID     = "#e2e8f0"   # slate-200
+
 
 def main() -> int:
     canon = json.loads((DATA / "canonical-results.json").read_text())
     frontier = canon["frontier_reference"]
-    bars = [
-        ("A: baseline\n(GLM-5.1, no skill)", 100 * canon["configs"]["A_baseline"]["aggregate_over_measured"], "#9aa0a6"),
-        ("B: + GLM-authored skill",          100 * canon["configs"]["B_GLM_skill"]["aggregate_over_measured"], "#6366f1"),
-        ("C: + Opus-authored skill",         100 * canon["configs"]["C_Opus_skill"]["aggregate_over_measured"], "#2563eb"),
-        (f"{frontier['name'].split(' on')[0]}\n(frontier reference)", 100 * frontier["pass_rate"], "#cbd5e1"),
+    series = [
+        ("A: baseline\nGLM-5.1, no skill",     100 * canon["configs"]["A_baseline"]["aggregate_over_measured"],   COLOR_BASELINE, None),
+        ("B: + GLM-authored\nskill",            100 * canon["configs"]["B_GLM_skill"]["aggregate_over_measured"],  COLOR_B,        None),
+        ("C: + Opus-authored\nskill",           100 * canon["configs"]["C_Opus_skill"]["aggregate_over_measured"], COLOR_C,        None),
+        (f"{frontier['name'].split(' on')[0]}\nfrontier reference",  100 * frontier["pass_rate"],                  COLOR_FRONTIER, "//"),
     ]
-    baseline_val = bars[0][1]
+    labels, values, colors, hatches = zip(*series)
+    baseline_val = values[0]
 
-    fig, ax = plt.subplots(figsize=(10, 5.8), dpi=144)
-    labels, values, colors = zip(*bars)
-    bar_artists = ax.bar(labels, values, color=colors, edgecolor="#1f2937", linewidth=0.6, width=0.62)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=144)
+    fig.patch.set_facecolor("white")
+
+    # Bars
+    bar_artists = ax.bar(
+        labels, values,
+        color=colors, edgecolor="white", linewidth=0,
+        width=0.62, zorder=3,
+    )
+    # Hatch the frontier-reference bar to mark it as external
+    for bar, hatch in zip(bar_artists, hatches):
+        if hatch:
+            bar.set_hatch(hatch)
+            bar.set_edgecolor("#d97706")  # amber-600 hatch lines
+            bar.set_linewidth(0)
+    # Slightly subtle outline on the headline (C) bar to draw the eye
+    bar_artists[2].set_edgecolor("#1e3a8a")
+    bar_artists[2].set_linewidth(1.2)
 
     # Value labels on top of each bar
     for bar, val in zip(bar_artists, values):
-        ax.text(bar.get_x() + bar.get_width()/2, val + 1.2, f"{val:.1f}%",
-                ha="center", va="bottom", fontsize=11, fontweight="bold", color="#0f172a")
+        ax.text(
+            bar.get_x() + bar.get_width()/2, val + 0.7, f"{val:.1f}%",
+            ha="center", va="bottom", fontsize=12, fontweight="bold", color=COLOR_TEXT, zorder=5,
+        )
 
-    # Lift annotations above the skill bars (B and C)
+    # Lift pills above the skill bars (B and C) -- offset enough to clear the value label
     for i in (1, 2):
         delta = values[i] - baseline_val
         ax.annotate(
-            f"+{delta:.1f} pp", xy=(i, values[i] + 5.5), ha="center", va="bottom",
-            fontsize=10.5, color="#15803d", fontweight="bold",
+            f"+{delta:.1f} pp",
+            xy=(i, values[i] + 5.5),
+            ha="center", va="bottom",
+            fontsize=10.5, color="white", fontweight="bold",
+            bbox=dict(boxstyle="round,pad=0.45", facecolor=COLOR_LIFT, edgecolor="none"),
+            zorder=6,
         )
 
-    # Dashed line at baseline level to anchor the reader's eye
-    ax.axhline(baseline_val, linestyle="--", linewidth=0.9, color="#9aa0a6", alpha=0.7, zorder=0)
-    ax.text(3.45, baseline_val - 1.2, "baseline", ha="right", va="top", fontsize=9, color="#6b7280", style="italic")
+    # Dashed baseline reference line (no inline label -- bar A's "59.4 %" value label already names it)
+    ax.axhline(baseline_val, linestyle=(0, (3, 3)), linewidth=0.9, color=COLOR_MUTED, alpha=0.55, zorder=1)
 
-    # Axes & spines
-    ax.set_ylabel("Terminal-Bench 2.1 aggregated score  (%)", fontsize=11, color="#1f2937")
-    ax.set_ylim(0, 100)
-    ax.set_yticks(range(0, 101, 20))
-    ax.tick_params(axis="y", labelsize=9.5, colors="#4b5563")
-    ax.tick_params(axis="x", labelsize=10, colors="#1f2937", pad=6)
-    for spine in ("top", "right"):
+    # Axes
+    ax.set_ylabel("Aggregated score  (%)", fontsize=11, color=COLOR_TEXT, labelpad=10)
+    ax.set_ylim(30, 100)
+    ax.set_yticks(range(30, 101, 10))
+    ax.tick_params(axis="y", labelsize=10, colors=COLOR_MUTED, length=0)
+    ax.tick_params(axis="x", labelsize=10, colors=COLOR_TEXT, pad=8, length=0)
+    for spine in ("top", "right", "left"):
         ax.spines[spine].set_visible(False)
-    for spine in ("left", "bottom"):
-        ax.spines[spine].set_color("#cbd5e1")
-    ax.grid(axis="y", linestyle=":", linewidth=0.5, color="#e5e7eb", zorder=0)
+    ax.spines["bottom"].set_color(COLOR_GRID)
+    ax.spines["bottom"].set_linewidth(1)
+    ax.grid(axis="y", linestyle="-", linewidth=0.7, color=COLOR_GRID, zorder=0)
     ax.set_axisbelow(True)
 
-    # Title + subtitle (title above, subtitle below — standard convention)
+    # Title + subtitle (title first, subtitle below — note the y-axis truncation here)
     fig.suptitle(
         "A learned skill file lifts an open-weight agent on Terminal-Bench 2.1",
-        fontsize=13.5, fontweight="bold", color="#0f172a", x=0.125, y=0.96, ha="left",
+        fontsize=14.5, fontweight="bold", color=COLOR_TEXT, x=0.082, y=0.965, ha="left",
     )
     ax.set_title(
-        "89 tasks · K=3 attempts · 87 measured under every condition · GLM-5.1 as the executor",
-        fontsize=9.5, color="#6b7280", style="italic", pad=12, loc="left",
+        "89 tasks · K=3 attempts · 87 measured under every condition · y-axis starts at 30 % to highlight differences",
+        fontsize=10, color=COLOR_MUTED, style="italic", pad=14, loc="left",
     )
 
-    plt.tight_layout(rect=(0, 0, 1, 0.93))
+    plt.subplots_adjust(left=0.08, right=0.97, top=0.88, bottom=0.16)
     out = ASSETS / "post-1-accuracy.png"
     plt.savefig(out, dpi=144, facecolor="white")
     print(f"Wrote {out}")
