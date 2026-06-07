@@ -20,7 +20,7 @@ That five-line note is the missing piece. ContinuumAI is the project we are runn
 
 ## What we built, briefly
 
-The mechanism is adapted from [Letta's skill-learning recipe](https://www.letta.com/blog/skill-learning).
+Skill learning for stateful agents — the open question of how to make agent sessions accumulate transferable knowledge across runs without retraining the underlying model — has become an active research focus across both academic groups and industry labs over the past 18 months [1, 2]. The two-stage structure we use here (reflect on a session trajectory, write the lesson to a skill artifact, load it at run time) is one of several approaches that have shown empirical signal in published reports. Most of the recent debate has been about *how strict the loop should be* (one-shot vs validation-gated vs iterative-refined) and *where the lesson should live* (model weights, vector store, plain-text Markdown file). The continuum thesis is closest to the last.
 
 After an agent session ends — pass or fail — a **Reflector** LLM call reads the full session trajectory. Not just the final output: every command the agent ran, every observation it made, every dead end it explored. The Reflector's job is to extract the single load-bearing decision that determined the outcome. Not a list of mistakes; just the one thing that, if the agent had known it going in, would have fixed the run.
 
@@ -57,18 +57,18 @@ Three conditions:
 | **B**: GLM-5.1 + GLM-authored skill | **62.8 %** | **+3.4 pp** |
 | **C**: GLM-5.1 + Opus-authored skill | **64.0 %** | **+4.6 pp** |
 
-A +4.6-point lift on a benchmark at this hardness level — from a single failure trajectory per task, with no iterative refinement and no validation gating — is the headline. For context:
+A +4.6-point lift on a benchmark at this hardness level — from a single failure trajectory per task, with no iterative refinement and no validation gating — is the headline. For context, published results in this research area have reported:
 
-- Letta's published TB-2.0 trajectory-only result on the easier predecessor benchmark was **+9 points**.
-- [SkillOpt](https://microsoft.github.io/SkillOpt/)'s iterative-gated approach on a broader benchmark suite reports **+9 to +25 points** depending on the benchmark.
+- **+9 points** for trajectory-only approaches on the easier predecessor benchmark (TB-2.0) [1]
+- **+9 to +25 points** for iterative-gated approaches on broader benchmark suites (search QA, spreadsheets, ALFWorld), depending on the benchmark and the gating strictness [2]
 
-Our +4.6 sits below both, which is expected: TB-2.1 is harder than TB-2.0, our loop is simpler than SkillOpt's (no validation gate), and we used GLM-5.1 as the executor where SkillOpt used frontier closed models. The signal we wanted was *the loop works at all on a hard benchmark with an open-weight executor*, and it does. Closing more of the gap to SkillOpt-comparable numbers comes from adding the gate — that is the next iteration of the loop, and it is the next thing we will measure.
+Our +4.6 sits below both, which is expected: TB-2.1 is harder than TB-2.0, our loop is simpler than the gated variants (no validation gate), and we used GLM-5.1 as the executor where the +9-to-+25 numbers were obtained on frontier closed models. The signal we wanted was *the loop works at all on a hard benchmark with an open-weight executor*, and it does. Closing more of the gap to the gated-approach numbers comes from adding the gate — that is the next iteration of the loop, and it is the next thing we will measure.
 
 ### Two findings from the same run worth flagging
 
-**The author model matters less than you would expect.** Letta's recipe lets you mix-and-match: a stronger model can author skills that a weaker model executes. We tested both author conditions. Self-authoring (GLM-5.1 writing its own skills, condition B) captures about three-quarters of the lift that Opus-authoring (condition C) provides. The skill is the asset; the author is a multiplier on it, not a gate to it. This matters for both audiences. Individual developers and small teams running cheap open-weight executors can run the loop end-to-end without ever calling a frontier API. Engineering organizations that have Opus access for the skill-authoring step can extract a marginal improvement, but the bulk of the lift is available without it — which means the policy debate around "should we send our private trajectories to a frontier API?" has a defensible no-API-access answer if the answer is no.
+**The author model matters less than you would expect.** A design dimension explored in this literature is the author/executor split: a stronger model can author skills that a weaker model executes. We tested both author conditions. Self-authoring (GLM-5.1 writing its own skills, condition B) captures about three-quarters of the lift that Opus-authoring (condition C) provides. The skill is the asset; the author is a multiplier on it, not a gate to it. This matters for both audiences. Individual developers and small teams running cheap open-weight executors can run the loop end-to-end without ever calling a frontier API. Engineering organizations that have Opus access for the skill-authoring step can extract a marginal improvement, but the bulk of the lift is available without it — which means the policy debate around "should we send our private trajectories to a frontier API?" has a defensible no-API-access answer if the answer is no.
 
-**Some skills regress their target tasks.** A small number of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 after a skill was loaded. The loop ships every skill the author produces — there is no validation gate yet — so this is the expected failure mode of the simplest version. Adding the gate, as SkillOpt does, catches most of these before they ship. A post in this series will walk through specific regressed skills and what the Reflector got wrong; the failure modes are instructive.
+**Some skills regress their target tasks.** A small number of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 after a skill was loaded. The loop ships every skill the author produces — there is no validation gate yet — so this is the expected failure mode of the simplest version. Adding a validation gate, as iterative-refinement approaches do [2], catches most of these before they ship. A post in this series will walk through specific regressed skills and what the Reflector got wrong; the failure modes are instructive.
 
 ## Reproducibility
 
@@ -92,6 +92,11 @@ This post is the first of three.
 **Post 3 — Case studies.** Detailed write-ups of individual skills that took specific tasks from "never solved" to "always solved." Each case includes the full SKILL.md text, the failure trajectory that produced it, and a discussion of what the Reflector got right — and in two cases, what it got wrong. Relevant reading if you want to understand what skill-learning actually encodes and what it cannot.
 
 A bonus methodology post is coming out of band, sooner — on a 65 % budget-anomaly finding that surfaced midway through this run. If your team publishes or trusts agent benchmark numbers, you will want to see it before your next publication.
+
+## References
+
+[1] *Skill Learning* — Letta, 2026. https://www.letta.com/blog/skill-learning
+[2] *SkillOpt: Optimizing Natural-Language Skills as the Trainable State of Frozen Agents* — Microsoft Research, 2026. https://microsoft.github.io/SkillOpt/ · paper: https://arxiv.org/abs/2605.23904
 
 ## Closing
 
