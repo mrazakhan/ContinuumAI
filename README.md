@@ -30,10 +30,12 @@ This repository is self-contained:
 
 ```bash
 git clone https://github.com/mrazakhan/ContinuumAI.git
-cd ContinuumAI && python3 scripts/aggregate.py
+cd ContinuumAI
+python3 scripts/aggregate.py    # regenerates every headline number
+python3 scripts/plot.py         # regenerates the bar chart in BLOG.md
 ```
 
-Reads [`data/raw-trials.json`](data/raw-trials.json) (699 per-trial records, ~230 KB — reward, token usage, per-trial cost) and writes [`data/canonical-results.json`](data/canonical-results.json) + [`data/canonical-results.md`](data/canonical-results.md). Every number in Post 1 reproduces exactly.
+The aggregator reads [`data/raw-trials.json`](data/raw-trials.json) (699 per-trial records, ~230 KB — reward, token usage, per-trial cost) and writes [`data/canonical-results.json`](data/canonical-results.json) + [`data/canonical-results.md`](data/canonical-results.md). The plot script reads the canonical-results JSON and writes [`assets/post-1-accuracy.png`](assets/post-1-accuracy.png). Every number and figure in Post 1 reproduces exactly.
 
 ## Repo layout
 
@@ -41,9 +43,11 @@ Reads [`data/raw-trials.json`](data/raw-trials.json) (699 per-trial records, ~23
 |---|---|
 | [`BLOG.md`](BLOG.md) | Post 1 — the amnesiac problem and the Terminal-Bench 2.1 measurement |
 | [`scripts/aggregate.py`](scripts/aggregate.py) | Single deterministic aggregation script — source of truth for every number |
+| [`scripts/plot.py`](scripts/plot.py) | Regenerates the BLOG.md bar chart from `canonical-results.json` |
 | [`data/raw-trials.json`](data/raw-trials.json) | 699 per-trial records (reward + token usage + cost) |
 | [`data/canonical-results.json`](data/canonical-results.json) | Machine-readable script output |
 | [`data/canonical-results.md`](data/canonical-results.md) | Human-readable summary |
+| [`assets/post-1-accuracy.png`](assets/post-1-accuracy.png) | The bar chart embedded in Post 1 |
 
 ## The continuity loop in a paragraph
 

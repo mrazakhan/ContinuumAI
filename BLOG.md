@@ -57,6 +57,10 @@ Three conditions:
 | **B**: GLM-5.1 + GLM-authored skill | **62.8 %** | **+3.4 pp** |
 | **C**: GLM-5.1 + Opus-authored skill | **64.0 %** | **+4.6 pp** |
 
+![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 pp), C Opus-skill at 64.0 % (+4.6 pp), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
+
+*Reproduced from [`scripts/plot.py`](scripts/plot.py); regenerated automatically from `data/canonical-results.json` whenever the aggregation script re-runs.*
+
 A +4.6-point lift on a benchmark at this hardness level — from a single failure trajectory per task, with no iterative refinement and no validation gating — is the headline. For context, published results in this research area have reported:
 
 - **+9 points** for trajectory-only approaches on the easier predecessor benchmark (TB-2.0) [1]
