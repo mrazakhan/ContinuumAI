@@ -41,24 +41,25 @@ plt.rcParams.update({
 })
 
 # Color palette
-COLOR_BASELINE = "#94a3b8"   # slate-400  -- neutral control
-COLOR_B        = "#60a5fa"   # blue-400   -- first skill condition
-COLOR_C        = "#1d4ed8"   # blue-700   -- best skill condition (our headline)
-COLOR_FRONTIER = "#fbbf24"   # amber-400  -- external reference
-COLOR_LIFT     = "#16a34a"   # green-600  -- positive delta pill
-COLOR_TEXT     = "#0f172a"   # slate-900
-COLOR_MUTED    = "#64748b"   # slate-500
-COLOR_GRID     = "#e2e8f0"   # slate-200
+COLOR_BASELINE      = "#94a3b8"   # slate-400  -- neutral control
+COLOR_B             = "#93c5fd"   # blue-300   -- first skill condition (soft)
+COLOR_C             = "#1d4ed8"   # blue-700   -- best skill condition (headline)
+COLOR_FRONTIER_FILL = "#f1f5f9"   # slate-100  -- pale fill for external reference
+COLOR_FRONTIER_HATCH = "#64748b"  # slate-500  -- subtle hatch for external reference
+COLOR_LIFT          = "#16a34a"   # green-600  -- positive delta pill
+COLOR_TEXT          = "#0f172a"   # slate-900
+COLOR_MUTED         = "#64748b"   # slate-500
+COLOR_GRID          = "#e2e8f0"   # slate-200
 
 
 def main() -> int:
     canon = json.loads((DATA / "canonical-results.json").read_text())
     frontier = canon["frontier_reference"]
     series = [
-        ("A: baseline\nGLM-5.1, no skill",     100 * canon["configs"]["A_baseline"]["aggregate_over_measured"],   COLOR_BASELINE, None),
-        ("B: + GLM-authored\nskill",            100 * canon["configs"]["B_GLM_skill"]["aggregate_over_measured"],  COLOR_B,        None),
-        ("C: + Opus-authored\nskill",           100 * canon["configs"]["C_Opus_skill"]["aggregate_over_measured"], COLOR_C,        None),
-        (f"{frontier['name'].split(' on')[0]}\nfrontier reference",  100 * frontier["pass_rate"],                  COLOR_FRONTIER, "//"),
+        ("A: baseline\nGLM-5.1, no skill",     100 * canon["configs"]["A_baseline"]["aggregate_over_measured"],   COLOR_BASELINE,      None),
+        ("B: + GLM-authored\nskill",            100 * canon["configs"]["B_GLM_skill"]["aggregate_over_measured"],  COLOR_B,             None),
+        ("C: + Opus-authored\nskill",           100 * canon["configs"]["C_Opus_skill"]["aggregate_over_measured"], COLOR_C,             None),
+        (f"{frontier['name'].split(' on')[0]}\nfrontier reference",  100 * frontier["pass_rate"],                  COLOR_FRONTIER_FILL, "////"),
     ]
     labels, values, colors, hatches = zip(*series)
     baseline_val = values[0]
@@ -72,13 +73,15 @@ def main() -> int:
         color=colors, edgecolor="white", linewidth=0,
         width=0.62, zorder=3,
     )
-    # Hatch the frontier-reference bar to mark it as external
+    # Style the frontier-reference bar: pale fill, subtle slate hatch, thin outline
+    plt.rcParams["hatch.color"] = COLOR_FRONTIER_HATCH
+    plt.rcParams["hatch.linewidth"] = 0.6
     for bar, hatch in zip(bar_artists, hatches):
         if hatch:
             bar.set_hatch(hatch)
-            bar.set_edgecolor("#d97706")  # amber-600 hatch lines
-            bar.set_linewidth(0)
-    # Slightly subtle outline on the headline (C) bar to draw the eye
+            bar.set_edgecolor(COLOR_MUTED)
+            bar.set_linewidth(0.8)
+    # Subtle outline on the headline (C) bar to draw the eye
     bar_artists[2].set_edgecolor("#1e3a8a")
     bar_artists[2].set_linewidth(1.2)
 
