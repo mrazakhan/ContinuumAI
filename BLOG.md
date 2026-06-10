@@ -145,7 +145,7 @@ Two more posts in this series, plus a methodology bonus dropping out of band:
 
 ## Closing
 
-The amnesiac problem isn't a curiosity. It's the single biggest reason we hear that AI agent pilots *"didn't work out"* after six months — the agents are useful at first, then they plateau. They never become *the senior engineer's agent that's been in the trenches*. They stay junior forever.
+The amnesiac problem isn't a curiosity. It's one of the biggest reasons agent pilots quietly stall — the agents are useful at first, then they plateau. They never become *the senior engineer's agent that's been in the trenches*. They stay junior forever.
 
 That's what ContinuumAI is built to change. Skills accumulate — across every developer on your team, every model in your routing layer, every quarter the system runs. The agent gets meaningfully better at *your* stack every time anyone on your team uses it.
 
