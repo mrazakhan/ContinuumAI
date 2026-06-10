@@ -1,12 +1,12 @@
-# AI agents are amnesiacs. We measured a fix that lets them compound knowledge across sessions.
+# AI agents are amnesiacs.
 
 *Post 1 of 3 in the ContinuumAI series. Published 2026-06-02.*
 
 ## The amnesiac problem
 
-Every modern LLM coding agent — *Cursor, Claude Code, Aider, OpenHands, Codex, the one your platform team is building in-house* — shares one limiting structural property: **no memory across sessions.**
+Pick any coding agent you might be using — *Cursor, Claude Code, Aider, OpenHands, Codex, whatever your platform team is building in-house* — and they all share one structural property: **no memory across sessions.**
 
-Each task starts from scratch. The agent works through a problem, makes mistakes, eventually finishes (or doesn't), and then everything it learned in that session evaporates the moment the conversation ends.
+Each task starts from scratch. The agent works through the problem, makes mistakes, eventually finishes (or doesn't), and then everything it learned evaporates the moment the conversation ends.
 
 **For an individual developer this is mildly annoying:**
 
@@ -21,21 +21,21 @@ Each task starts from scratch. The agent works through a problem, makes mistakes
 - The institutional knowledge your humans accumulate across PRs, postmortems, design reviews, and onboarding wikis has no analog for agents
 - ***Your humans compound. Your agents do not.***
 
-The absence of that compounding shows up in the most common pilot postmortem we hear from engineering leaders:
+We hear the same postmortem from engineering leaders almost every time we ask:
 
 > *"The agent worked great for the first two weeks. By month six it felt like the same agent we started with, doing the same tasks, getting tripped up by the same things."*
 
 Of course it did. There was no mechanism for it to be anything else.
 
-**The bigger model is not the fix.** Frontier closed models can already solve essentially every Terminal-Bench 2.1 task if you give them enough tokens. The gating constraint — increasingly — is whether the *system* can carry yesterday's lesson into today.
+**And the bigger model isn't the fix.** Frontier closed models can already solve essentially every Terminal-Bench 2.1 task if you give them enough tokens. The constraint that actually bites — increasingly — is whether the *system around the model* can carry yesterday's lesson into today.
 
 That five-line note — the one your senior engineer would write after spending forty minutes on a gotcha — is the missing piece.
 
 ## What ContinuumAI does
 
-**ContinuumAI is the glue mechanism between agent sessions.** It captures what an agent learned in one session and makes it available to every related session that follows — *automatically, in the background, with no human curation step.*
+**ContinuumAI is the missing layer between agent sessions.** It captures what an agent learned in one session, turns it into a short reusable artifact, and makes it available to every related session that follows — in the background, with no human curation step in between.
 
-The loop:
+Here's the loop:
 
 ```mermaid
 flowchart LR
@@ -43,10 +43,10 @@ flowchart LR
     B --> C[Reflector LLM<br/>extracts single<br/>load-bearing insight]
     C --> D[SkillCreator LLM<br/>writes SKILL.md<br/>file]
     D --> E[(Skill library<br/>+1 skill)]
-    E -. loaded automatically<br/>at the start of every<br/>related session .-> A
+    E -. loaded at the start of<br/>the next related session .-> A
 ```
 
-Two LLM calls. One Markdown file out per session. The library accumulates: skills authored at 11 p.m. on a Tuesday are available to your colleague's agent at 9 a.m. on Wednesday. The same SKILL.md works regardless of which model your routing layer (*OpenRouter, AWS Bedrock, direct providers*) hands the next request to.
+Two LLM calls. One Markdown file out per session. The library accumulates: a skill authored at 11 p.m. on a Tuesday is available to your colleague's agent at 9 a.m. on Wednesday. And the same SKILL.md keeps working regardless of which model your routing layer (*OpenRouter, AWS Bedrock, direct providers*) hands the next request to.
 
 **What the loop is NOT:**
 
@@ -57,9 +57,9 @@ Two LLM calls. One Markdown file out per session. The library accumulates: skill
 
 ## The compounding cost advantage
 
-Without the glue, **every agent session pays the cost of re-discovering the same problems**. The dollar cost compounds badly — an enterprise running thousands of agent sessions a day across hundreds of engineers is paying for the same gotcha to be discovered N times over. The wall-clock cost is worse: every developer waits while the agent re-explores what was already known.
+As long as agents keep starting from zero every time, **every session pays the cost of re-discovering the same problems**. The dollar cost gets ugly fast — a team running thousands of agent sessions a day across hundreds of engineers is paying for the same gotcha to be discovered, again, in each of those sessions. The wall-clock cost is worse: every developer is waiting while the agent re-explores what was already known.
 
-**With the glue, that cost is paid once.**
+**Once you capture the lesson once, that cost is paid once.**
 
 | Audience | What changes |
 |---|---|
@@ -104,39 +104,41 @@ A **+4.6-point lift** on a benchmark at this hardness — *from a single failure
 
 Our +4.6 sits below both, which is expected: *TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and the executor is GLM-5.1 rather than a frontier closed model.* The signal we wanted was the loop works at all on a hard benchmark with an open-weight executor — and it does.
 
-### Two findings worth flagging
+### Two findings from the run worth flagging
 
-**🔑 The author model matters less than you would expect.**
-Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarters* of the lift that Opus-authoring (C) provides. The skill is the asset; the author is a multiplier, not a gate. Implications:
+**🔑 The author model matters less than you'd expect.**
+Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarters* of the lift that Opus-authoring (C) provides. The skill is the asset; the author is a multiplier on it, not a gate to it. What this means in practice:
 
-- Individual developers and small teams can run the loop end-to-end on cheap open-weight models — *no frontier API call ever required*
-- Enterprises with privacy constraints get a defensible *"we do not need to send private trajectories to a frontier API"* answer
-- The economics work without dependency on any single model vendor
+- Individual developers and small teams can run the whole loop on a cheap open-weight model — *no frontier API call required, ever*
+- Enterprises with privacy constraints have a defensible *"we don't have to send private trajectories to a frontier API"* answer
+- The economics don't depend on any single model vendor staying cheap
 
 **⚠️ Some skills regress their target tasks.**
-A small number of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 after a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected failure mode of the simplest version. The next iteration adds the gate (iterative-refinement approach from [2]); we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
+A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so that's the expected failure mode of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
 
 ## Our north star
 
-**An agent that is *yours*.** Not generic. Not whatever some model vendor trained on the public internet. An agent whose value comes from accumulating the specific knowledge of *your* codebase, *your* team, *your* failures — and that gets sharper every quarter without anyone retraining anything.
+The agent we're trying to build is the one that's *yours*. Not generic, not whatever some model vendor trained on the public internet — but an agent whose value comes from accumulating the specific knowledge of your codebase, your team, your past failures. One that gets sharper every quarter without anyone retraining anything.
 
-That requires:
+To get there, the system needs:
 
-- ✅ A **persistent, accumulating skill library** scoped per-project, per-team, per-org *(first version shipped)*
+- ✅ A **persistent, accumulating skill library**, scoped per-project, per-team, per-org *(first version shipped)*
 - ✅ **Automatic capture from every session** — not opt-in, not manual *(covered above)*
 - 🚧 **Validation-gated skill acceptance** so the library never regresses *(next iteration)*
 - ✅ **Cross-model transferability** so skill investments survive model upgrades *(by design — quantified in Post 2)*
-- 🚧 **Per-team and per-org scoping with access controls** *(in design — relevant for the enterprise rollout)*
+- 🚧 **Per-team and per-org scoping with access controls** *(in design — for the enterprise rollout)*
 
-The +4.6-point measurement on TB-2.1 is the first public proof point. The measurement we eventually care about is what happens *quarter over quarter* in a team that runs the loop in production — where lessons compound, where one engineer's hard-won debugging session bootstraps every other engineer's agent, and where the value of the system grows along an axis that has nothing to do with the next model release.
+The +4.6-point lift on TB-2.1 is the first public proof point. The one we actually care about is what happens *quarter over quarter* in a team running the loop in production — where lessons compound, where one engineer's hard-won debugging session bootstraps every other engineer's agent, and where the system's value grows along an axis that has nothing to do with the next model release.
 
-That is what ContinuumAI is built to do.
+That's what we're building toward.
 
-## What's next
+## What's coming up
 
-- **Post 2** — *the cost story:* what happens to your monthly agent inference bill when an open-weight executor + skills replaces a frontier closed model
-- **Post 3** — *case studies:* individual skills with full SKILL.md text — what worked, what regressed, why
-- **Bonus** — *the 65 % budget anomaly:* a methodology finding from this run that should change how you read every other agent benchmark
+Two more posts in this series, plus a methodology bonus dropping out of band:
+
+- **Post 2 — what this actually costs.** I'll put the per-attempt and per-passed-task dollars from this run next to what those same tasks would cost on Opus 4.8 at the same token usage. If the line item *"agent inference"* on your monthly bill matters, this is the post to wait for.
+- **Post 3 — what the skills actually look like.** I'll walk through a handful of individual SKILL.md files — the failure trajectories they came from, what each one teaches in plain English, why a couple of them regressed. Useful if you want to understand what skill-learning actually encodes (and what it doesn't).
+- **Bonus — the 65 % budget anomaly.** A methodology finding from this run that I think most teams haven't accounted for. If your team trusts or publishes agent benchmark numbers, you'll want this one before your next publication.
 
 ## References
 
@@ -145,8 +147,8 @@ That is what ContinuumAI is built to do.
 
 ## Closing
 
-The amnesiac problem is not a curiosity. It is the single biggest reason organizations report that AI agent pilots *"did not work out"* after six months — the agents are useful at first, but they never compound. They never become *the senior engineer's agent that has been in the trenches.* They stay junior forever.
+The amnesiac problem isn't a curiosity. It's the single biggest reason we hear that AI agent pilots *"didn't work out"* after six months — the agents are useful at first, then they plateau. They never become *the senior engineer's agent that's been in the trenches*. They stay junior forever.
 
-**ContinuumAI is the glue mechanism that fixes that.** Skills accumulate across every developer on your team, every model in your routing layer, and every quarter the system runs. The agent gets meaningfully better at *your* stack every time anyone on your team uses it.
+That's what ContinuumAI is built to change. Skills accumulate — across every developer on your team, every model in your routing layer, every quarter the system runs. The agent gets meaningfully better at *your* stack every time anyone on your team uses it.
 
-If you're an individual developer tired of re-explaining the same gotchas, or an engineering leader watching the same skill rediscover itself across every engineer's session, open a thread in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions) and tell us what you're running. We are particularly interested in cases where the same gotcha keeps surfacing across team members — those are the highest-value places to drop a skill, and exactly the workloads the next iteration of the loop is being designed around.
+If you're an individual developer tired of re-explaining the same gotchas, or an engineering leader watching the same skill rediscover itself across every engineer's session, come open a thread in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions) and tell us what you're running. We're particularly interested in cases where the same gotcha keeps surfacing across team members — those are the highest-value places to drop a skill, and they're exactly the workloads the next iteration of the loop is being designed around.
