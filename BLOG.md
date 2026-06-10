@@ -14,11 +14,11 @@ Each task starts from scratch. The agent works through the problem, makes mistak
 - It re-proposes the dead-end approach you and your team explicitly rejected on Slack three weeks ago, because nothing in its context remembers any of that
 - You spend more time re-explaining the project's basics — *which logger, which test runner, which branch ships to prod, where the deploy script actually lives* — than you spend on the actual change you opened the chat for
 
-**For an engineering organization this is significantly more expensive:**
+**For an engineering team it gets expensive fast:**
 
 - Every engineer's agent runs through the same gotcha library independently
 - The skill your senior engineer's agent acquired last quarter does **not** transfer to the junior engineer's agent next quarter
-- The institutional knowledge your humans accumulate across PRs, postmortems, design reviews, and onboarding wikis has no analog for agents
+- Your humans build up institutional knowledge across PRs, postmortems, design reviews, and onboarding wikis — and there's no equivalent for agents
 - ***Your humans compound. Your agents do not.***
 
 This is the pattern we keep seeing in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks, keeps getting tripped up by the same things, and the next model upgrade doesn't move it past the plateau either.
@@ -31,7 +31,7 @@ What's missing is the five-line note your senior engineer would jot down after s
 
 ## What ContinuumAI does
 
-**ContinuumAI is the missing layer between agent sessions.** It captures what an agent learned in one session, turns it into a short reusable artifact, and makes it available to every related session that follows — in the background, with no human curation step in between.
+**ContinuumAI is the missing layer between agent sessions.** When a session ends, we look at what happened, pull out the lesson, and turn it into a short file the next session can read. No human in the middle, no manual curation.
 
 Here's the loop:
 
@@ -44,7 +44,7 @@ flowchart LR
     E -. loaded at the start of<br/>the next related session .-> A
 ```
 
-Two LLM calls. One Markdown file out per session. The library accumulates: a skill authored at 11 p.m. on a Tuesday is available to your colleague's agent at 9 a.m. on Wednesday. And the same SKILL.md keeps working regardless of which model your routing layer (*OpenRouter, AWS Bedrock, direct providers*) hands the next request to.
+Two LLM calls in, one Markdown file out. The library grows by one per session. A skill written at 11 p.m. on a Tuesday is loaded by your colleague's agent at 9 a.m. on Wednesday — and the file works the same whether your routing layer (*OpenRouter, Bedrock, direct provider*) sends the next request to GLM, Claude, or anything else.
 
 **What the loop is NOT:**
 
@@ -55,16 +55,16 @@ Two LLM calls. One Markdown file out per session. The library accumulates: a ski
 
 ## The compounding cost advantage
 
-As long as agents keep starting from zero every time, **every session pays the cost of re-discovering the same problems**. The dollar cost gets ugly fast — a team running thousands of agent sessions a day across hundreds of engineers is paying for the same gotcha to be discovered, again, in each of those sessions. The wall-clock cost is worse: every developer is waiting while the agent re-explores what was already known.
+While agents keep starting from zero, **every session is paying to rediscover the same things**. The dollar cost gets ugly fast: a team running thousands of agent sessions a day across hundreds of engineers is paying for the same gotcha to get rediscovered, session after session after session. The wall-clock cost is worse — every developer sits there waiting while the agent re-treads ground that's already been covered.
 
 **Once you capture the lesson once, that cost is paid once.**
 
 | Audience | What changes |
 |---|---|
 | **Individual developer** | An hour saved every time a repeated gotcha shows up; an agent that grows quietly sharper at *your* stack week after week |
-| **Engineering organization** | Monthly agent inference bill drops meaningfully (we quantify this in Post 2); institutional knowledge becomes a *capturable, replayable, auditable artifact* the same way commits are; team-wide compounding starts happening across every PR |
+| **Engineering organization** | The monthly agent inference bill drops (we'll quantify this in Post 2). Institutional knowledge becomes something you can capture, replay, and audit — the same way commits are. And team-wide compounding starts kicking in across every PR. |
 
-The ROI shape is unusual for an AI product: **it improves the longer you run it, without model upgrades.**
+This is the unusual part: **the product gets more useful the longer you run it. No model upgrade required.**
 
 ## Measuring it on Terminal-Bench 2.1
 
@@ -95,12 +95,12 @@ K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured und
 
 ![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 pp), C Opus-skill at 64.0 % (+4.6 pp), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
 
-A **+4.6-point lift** on a benchmark at this hardness — *from a single failure trajectory per task, with no iterative refinement and no validation gate* — is the headline. For context, published results in this research area have reported:
+**+4.6 points** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard. For context, published results in this research area have reported:
 
 - **+9 points** for trajectory-only approaches on the easier predecessor benchmark (TB-2.0) [1]
 - **+9 to +25 points** for iterative-gated approaches on broader benchmark suites (search QA, spreadsheets, ALFWorld), depending on benchmark and gating strictness [2]
 
-Our +4.6 sits below both, which is expected: *TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and the executor is GLM-5.1 rather than a frontier closed model.* The signal we wanted was the loop works at all on a hard benchmark with an open-weight executor — and it does.
+Our +4.6 lands below both. That makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
 
 ### Two findings from the run worth flagging
 
@@ -112,7 +112,7 @@ Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarter
 - The economics don't depend on any single model vendor staying cheap
 
 **⚠️ Some skills regress their target tasks.**
-A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so that's the expected failure mode of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
+A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
 
 ## Our north star
 
@@ -126,7 +126,7 @@ To get there, the system needs:
 - ✅ **Cross-model transferability** so skill investments survive model upgrades *(by design — quantified in Post 2)*
 - 🚧 **Per-team and per-org scoping with access controls** *(in design — for the enterprise rollout)*
 
-The +4.6-point lift on TB-2.1 is the first public proof point. The one we actually care about is what happens *quarter over quarter* in a team running the loop in production — where lessons compound, where one engineer's hard-won debugging session bootstraps every other engineer's agent, and where the system's value grows along an axis that has nothing to do with the next model release.
+The +4.6-point lift on TB-2.1 is the first public sign that the loop works. The one we actually care about is what happens *quarter over quarter* in a team running this in production — lessons compound, one engineer's hard-won debug session bootstraps every other engineer's agent, and the system gets more valuable in a direction that has nothing to do with the next model release.
 
 That's what we're building toward.
 
@@ -147,6 +147,6 @@ Two more posts in this series, plus a methodology bonus dropping out of band:
 
 The amnesiac problem isn't a curiosity. It's one of the biggest reasons agent pilots quietly stall — the agents are useful at first, then they plateau. They never become *the senior engineer's agent that's been in the trenches*. They stay junior forever.
 
-That's what ContinuumAI is built to change. Skills accumulate — across every developer on your team, every model in your routing layer, every quarter the system runs. The agent gets meaningfully better at *your* stack every time anyone on your team uses it.
+That's what ContinuumAI is built to change. Skills accumulate — across every developer on your team, every model in your routing layer, every quarter the system runs. The agent gets noticeably better at *your* stack every time anyone on your team uses it.
 
 If you're an individual developer tired of re-explaining the same gotchas, or an engineering leader watching the same skill rediscover itself across every engineer's session, come open a thread in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions) and tell us what you're running. We're particularly interested in cases where the same gotcha keeps surfacing across team members — those are the highest-value places to drop a skill, and they're exactly the workloads the next iteration of the loop is being designed around.
