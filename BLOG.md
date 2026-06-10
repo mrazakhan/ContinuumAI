@@ -10,9 +10,9 @@ Each task starts from scratch. The agent works through a problem, makes mistakes
 
 **For an individual developer this is mildly annoying:**
 
-- Your agent re-discovers the same QEMU-userland-linker landmine on the same Rust crate, three Tuesdays in a row — forty minutes each time
-- It falls into the same SQLite-WAL-discard-on-close trap every time you run the recovery script
-- You spend more time re-explaining your project's conventions (*`ruff` not `black`; `uv` not `pip`; `mypy` in pre-commit*) than getting actual work done
+- Your agent reaches for `pip` even though your repo has been on `uv` since spring — or for `jest` even though you migrated to `vitest` last quarter — every new session, same wrong tool, fresh
+- It re-proposes the dead-end approach you and your team explicitly rejected on Slack three weeks ago, because nothing in its context remembers any of that
+- You spend more time re-explaining the project's basics — *which logger, which test runner, which branch ships to prod, where the deploy script actually lives* — than you spend on the actual change you opened the chat for
 
 **For an engineering organization this is significantly more expensive:**
 
