@@ -25,9 +25,9 @@ This is the pattern we keep seeing in agent pilots: useful out of the gate, then
 
 Of course it doesn't — there's no mechanism for it to.
 
-**And the bigger model isn't the fix.** Frontier closed models can already solve essentially every Terminal-Bench 2.1 task if you give them enough tokens. The constraint that actually bites — increasingly — is whether the *system around the model* can carry yesterday's lesson into today.
+**And throwing a bigger model at it doesn't help.** Frontier models can already chew through most Terminal-Bench 2.1 tasks if you give them enough tokens. Capability isn't the bottleneck. The bottleneck is that nothing about the *system around the model* carries yesterday's lesson into today.
 
-That five-line note — the one your senior engineer would write after spending forty minutes on a gotcha — is the missing piece.
+What's missing is the five-line note your senior engineer would jot down after spending forty minutes on a gotcha. That's all a skill is, really.
 
 ## What ContinuumAI does
 
