@@ -21,11 +21,9 @@ Each task starts from scratch. The agent works through the problem, makes mistak
 - The institutional knowledge your humans accumulate across PRs, postmortems, design reviews, and onboarding wikis has no analog for agents
 - ***Your humans compound. Your agents do not.***
 
-We hear the same postmortem from engineering leaders almost every time we ask:
+This is the pattern we keep seeing in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks, keeps getting tripped up by the same things, and the next model upgrade doesn't move it past the plateau either.
 
-> *"The agent worked great for the first two weeks. By month six it felt like the same agent we started with, doing the same tasks, getting tripped up by the same things."*
-
-Of course it did. There was no mechanism for it to be anything else.
+Of course it doesn't — there's no mechanism for it to.
 
 **And the bigger model isn't the fix.** Frontier closed models can already solve essentially every Terminal-Bench 2.1 task if you give them enough tokens. The constraint that actually bites — increasingly — is whether the *system around the model* can carry yesterday's lesson into today.
 
