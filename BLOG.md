@@ -109,6 +109,6 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 ## Closing
 
-The +4.6 on TB-2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
+The 4.6 percent lift on Terminal-Bench 2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
 
-If you have one of those, come tell us about it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions). That's the conversation we want to be having.
+If you have one of those, come tell us about it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions).
