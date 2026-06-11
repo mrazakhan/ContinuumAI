@@ -31,7 +31,9 @@ ASSETS.mkdir(exist_ok=True)
 
 plt.rcParams.update({
     "font.family": "sans-serif",
-    "font.sans-serif": ["Helvetica Neue", "Helvetica", "Inter", "Arial", "DejaVu Sans"],
+    "font.sans-serif": ["Helvetica Neue", "Helvetica", "Inter", "SF Pro Display", "Arial", "DejaVu Sans"],
+    "text.antialiased": True,
+    "pdf.fonttype": 42,  # TrueType embedding
 })
 
 # Palette (matches scripts/plot.py)
@@ -95,13 +97,16 @@ def main() -> int:
             edgecolor=stroke, facecolor=fill, zorder=2,
         )
         ax.add_patch(box)
-        # Title (bold, top of box)
-        ax.text(x, ROW_Y + 0.18, title, ha="center", va="center",
-                fontsize=11, color=text_color, fontweight="bold", zorder=3)
-        # Subtitle (italic, below title)
+        # Title — semibold (weight 600) for refined hierarchy vs heavy bold
+        ax.text(x, ROW_Y + 0.22, title, ha="center", va="center",
+                fontsize=12.5, color=text_color, fontweight=600, zorder=3)
+        # Subtitle — regular weight, not italic (italic adds visual heaviness
+        # that doesn't pay for itself at small sizes; weight + size contrast
+        # is enough hierarchy on its own). Brighter slate inside dark box.
+        sub_color = "#e2e8f0" if kind == "store" else "#475569"
         ax.text(x, ROW_Y - 0.32, sub, ha="center", va="center",
-                fontsize=9, color=text_color if kind != "store" else "#cbd5e1",
-                style="italic", zorder=3)
+                fontsize=10, color=sub_color, fontweight=400, zorder=3,
+                linespacing=1.45)
 
     # Forward arrows between adjacent nodes
     for i in range(len(NODES) - 1):
@@ -130,20 +135,23 @@ def main() -> int:
     ax.add_patch(loopback)
 
     # Loop-back label (centered between first and last node) — white background
-    # so it cuts cleanly through the dashed curve instead of getting struck through.
+    # cuts the dashed curve cleanly. Italic here works (it differentiates the
+    # label from the node-text subtitles, which are now roman).
     label_x = (x_start + x_end) / 2
     ax.text(
         label_x, 0.65,
         "loaded at the start of the next related session",
-        ha="center", va="center", fontsize=10.5, color=COLOR_TEXT_MUTED, style="italic",
-        bbox=dict(facecolor="white", edgecolor="none", pad=4),
+        ha="center", va="center", fontsize=11, color=COLOR_TEXT_MUTED,
+        style="italic", fontweight=500,
+        bbox=dict(facecolor="white", edgecolor="none", pad=5),
         zorder=5,
     )
 
-    # Optional caption / title above the diagram
+    # Title above the diagram — editorial size, semibold for refined look
     ax.text(
         7.0, 4.45, "The skill-generation loop",
-        ha="center", va="center", fontsize=14, color=COLOR_TEXT_DARK, fontweight="bold",
+        ha="center", va="center", fontsize=16, color=COLOR_TEXT_DARK,
+        fontweight=600,
     )
 
     plt.subplots_adjust(left=0.02, right=0.98, top=0.97, bottom=0.03)
