@@ -126,7 +126,7 @@ def main() -> int:
         fontsize=14.5, fontweight="bold", color=COLOR_TEXT, x=0.082, y=0.965, ha="left",
     )
     ax.set_title(
-        "89 tasks · K=3 attempts · 87 measured under every condition · y-axis starts at 30 % to highlight differences",
+        "89 tasks · K=3 attempts · 87 measured under every condition",
         fontsize=10, color=COLOR_MUTED, style="italic", pad=14, loc="left",
     )
 
