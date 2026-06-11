@@ -33,7 +33,7 @@ What's missing is the five-line note your senior engineer would jot down after s
 
 ## What ContinuumAI does
 
-ContinuumAI is our attempt at giving agents memory across sessions — small enough to start as a hobby project, structured enough to grow into something a team can rely on. When a session ends, we read the trajectory, pull out the lesson that mattered most, and save it as a short file the next session can read. No human in the middle, no manual curation.
+ContinuumAI is our attempt at giving agents memory across sessions. When a session ends, we read the trajectory, pull out the lesson that mattered most, and save it as a short file the next session can read. No human in the middle, no manual curation.
 
 Here's the loop:
 
