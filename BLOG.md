@@ -1,5 +1,7 @@
 # AI agents are amnesiacs.
 
+**Solving amnesia for coding agents — results from Terminal-Bench 2.1.**
+
 *Post 1 of 3 in the ContinuumAI series. Published 2026-06-02.*
 
 ## The amnesiac problem
