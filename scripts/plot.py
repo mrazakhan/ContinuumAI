@@ -2,18 +2,20 @@
 # SPDX-License-Identifier: Apache-2.0
 """Generate the post-1 accuracy plot from data/canonical-results.json.
 
-Output: assets/post-1-accuracy.png (1200 x 720 px, 144 DPI).
+Output: assets/post-1-accuracy.png (1500 x 900 px, 150 DPI).
 Re-run any time the canonical results regenerate to keep the plot in sync.
 
-Design choices:
-- Y axis truncated at 30 (declared in the subtitle); the differences
-  between conditions are 3-19 pp and look invisible against a 0-100 scale.
-- Two-tone blue family for the skill conditions (B lighter, C darker)
-  to encode "B comes first, C is the better artifact" at a glance.
-- Frontier reference uses a hatched amber fill to signal "external,
-  for comparison" without competing visually with our bars.
-- Lift annotations live in small green pills above the skill bars so
-  the headline "+4.6 pp" reads at thumbnail size.
+Editorial design choices:
+- Single accent: the deep navy on bar C is the visual focus; everything
+  else fades back. The baseline is a near-neutral cool grey; the frontier
+  reference is a quiet hatched bar; B is a soft mid-tone that bridges
+  A and C without competing with C.
+- Typography: large editorial title; thin italic subtitle; value labels
+  in muted slate, not bold black; lift deltas in small rounded green pills.
+- Negative space: generous padding around bars and title, lighter grid,
+  no axis frames except a hairline bottom rule.
+- No dashed baseline line: bar A's height + its value label already
+  anchor the eye, so the extra horizontal rule was schoolbook clutter.
 
 Usage::
 
@@ -26,13 +28,13 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 ASSETS = ROOT / "assets"
 ASSETS.mkdir(exist_ok=True)
 
-# Use the nicest system sans-serif available
 plt.rcParams.update({
     "font.family": "sans-serif",
     "font.sans-serif": ["Helvetica Neue", "Helvetica", "Inter", "Arial", "DejaVu Sans"],
@@ -40,16 +42,19 @@ plt.rcParams.update({
     "axes.labelsize": 11,
 })
 
-# Color palette
-COLOR_BASELINE      = "#94a3b8"   # slate-400  -- neutral control
-COLOR_B             = "#93c5fd"   # blue-300   -- first skill condition (soft)
-COLOR_C             = "#1d4ed8"   # blue-700   -- best skill condition (headline)
-COLOR_FRONTIER_FILL = "#f1f5f9"   # slate-100  -- pale fill for external reference
-COLOR_FRONTIER_HATCH = "#64748b"  # slate-500  -- subtle hatch for external reference
-COLOR_LIFT          = "#16a34a"   # green-600  -- positive delta pill
-COLOR_TEXT          = "#0f172a"   # slate-900
-COLOR_MUTED         = "#64748b"   # slate-500
-COLOR_GRID          = "#e2e8f0"   # slate-200
+# Refined editorial palette
+COLOR_BASELINE      = "#cbd5e1"   # slate-300  -- neutral control, recedes
+COLOR_B             = "#7dd3fc"   # sky-300    -- soft mid-tone
+COLOR_C             = "#0c4a6e"   # sky-900    -- deep navy, the visual focus
+COLOR_C_OUTLINE     = "#082f49"   # sky-950    -- subtle outline on C
+COLOR_FRONTIER_FILL = "#f8fafc"   # slate-50   -- near-white, recedes
+COLOR_FRONTIER_HATCH = "#94a3b8"  # slate-400  -- subtle hatch
+COLOR_LIFT          = "#15803d"   # green-700  -- muted, more sophisticated
+COLOR_TEXT_HEAD     = "#0f172a"   # slate-900  -- title
+COLOR_TEXT_VALUE    = "#475569"   # slate-600  -- value labels
+COLOR_TEXT_MUTED    = "#94a3b8"   # slate-400  -- subtitle, axis ticks
+COLOR_GRID          = "#f1f5f9"   # slate-100  -- almost invisible
+COLOR_RULE          = "#e2e8f0"   # slate-200  -- bottom axis hairline
 
 
 def main() -> int:
@@ -62,77 +67,76 @@ def main() -> int:
         (f"{frontier['name'].split(' on')[0]}\nfrontier reference",  100 * frontier["pass_rate"],                  COLOR_FRONTIER_FILL, "////"),
     ]
     labels, values, colors, hatches = zip(*series)
-    baseline_val = values[0]
 
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=144)
+    fig, ax = plt.subplots(figsize=(11, 6.5), dpi=150)
     fig.patch.set_facecolor("white")
 
-    # Bars
+    # Bars — slightly narrower, more whitespace between
     bar_artists = ax.bar(
         labels, values,
         color=colors, edgecolor="white", linewidth=0,
-        width=0.62, zorder=3,
+        width=0.56, zorder=3,
     )
-    # Style the frontier-reference bar: pale fill, subtle slate hatch, thin outline
+
+    # Style the frontier-reference bar (pale fill, subtle hatch)
     plt.rcParams["hatch.color"] = COLOR_FRONTIER_HATCH
-    plt.rcParams["hatch.linewidth"] = 0.6
+    plt.rcParams["hatch.linewidth"] = 0.5
     for bar, hatch in zip(bar_artists, hatches):
         if hatch:
             bar.set_hatch(hatch)
-            bar.set_edgecolor(COLOR_MUTED)
-            bar.set_linewidth(0.8)
-    # Subtle outline on the headline (C) bar to draw the eye
-    bar_artists[2].set_edgecolor("#1e3a8a")
-    bar_artists[2].set_linewidth(1.2)
+            bar.set_edgecolor(COLOR_TEXT_MUTED)
+            bar.set_linewidth(0.6)
+    # Faint outline on the headline (C) bar to draw the eye
+    bar_artists[2].set_edgecolor(COLOR_C_OUTLINE)
+    bar_artists[2].set_linewidth(1.0)
 
-    # Value labels on top of each bar
+    # Value labels — semibold, muted slate (not bold black)
     for bar, val in zip(bar_artists, values):
         ax.text(
-            bar.get_x() + bar.get_width()/2, val + 0.7, f"{val:.1f}%",
-            ha="center", va="bottom", fontsize=12, fontweight="bold", color=COLOR_TEXT, zorder=5,
+            bar.get_x() + bar.get_width()/2, val + 1.0, f"{val:.1f} %",
+            ha="center", va="bottom", fontsize=13, fontweight="600",
+            color=COLOR_TEXT_VALUE, zorder=5,
         )
 
-    # Lift pills above the skill bars (B and C) -- offset enough to clear the value label
+    # Lift pills above the skill bars (B and C) — muted green, rounded
+    baseline_val = values[0]
     for i in (1, 2):
         delta = values[i] - baseline_val
         ax.annotate(
             f"+{delta:.1f} pp",
-            xy=(i, values[i] + 5.5),
+            xy=(i, values[i] + 6.5),
             ha="center", va="bottom",
-            fontsize=10.5, color="white", fontweight="bold",
-            bbox=dict(boxstyle="round,pad=0.45", facecolor=COLOR_LIFT, edgecolor="none"),
+            fontsize=10.5, color="white", fontweight="600",
+            bbox=dict(boxstyle="round,pad=0.5", facecolor=COLOR_LIFT, edgecolor="none"),
             zorder=6,
         )
 
-    # Dashed baseline reference line (no inline label -- bar A's "59.4 %" value label already names it)
-    ax.axhline(baseline_val, linestyle=(0, (3, 3)), linewidth=0.9, color=COLOR_MUTED, alpha=0.55, zorder=1)
-
     # Axes
-    ax.set_ylabel("Aggregated score  (%)", fontsize=11, color=COLOR_TEXT, labelpad=10)
-    ax.set_ylim(30, 100)
+    ax.set_ylabel("Aggregated score  (%)", fontsize=11, color=COLOR_TEXT_MUTED, labelpad=14, fontweight="500")
+    ax.set_ylim(30, 102)
     ax.set_yticks(range(30, 101, 10))
-    ax.tick_params(axis="y", labelsize=10, colors=COLOR_MUTED, length=0)
-    ax.tick_params(axis="x", labelsize=10, colors=COLOR_TEXT, pad=8, length=0)
+    ax.tick_params(axis="y", labelsize=10, colors=COLOR_TEXT_MUTED, length=0)
+    ax.tick_params(axis="x", labelsize=10.5, colors=COLOR_TEXT_HEAD, pad=12, length=0)
     for spine in ("top", "right", "left"):
         ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_color(COLOR_GRID)
-    ax.spines["bottom"].set_linewidth(1)
-    ax.grid(axis="y", linestyle="-", linewidth=0.7, color=COLOR_GRID, zorder=0)
+    ax.spines["bottom"].set_color(COLOR_RULE)
+    ax.spines["bottom"].set_linewidth(0.8)
+    ax.grid(axis="y", linestyle="-", linewidth=0.6, color=COLOR_GRID, zorder=0)
     ax.set_axisbelow(True)
 
-    # Title + subtitle (title first, subtitle below — note the y-axis truncation here)
+    # Title and subtitle — editorial scale
     fig.suptitle(
         "A learned skill file lifts an open-weight agent on Terminal-Bench 2.1",
-        fontsize=14.5, fontweight="bold", color=COLOR_TEXT, x=0.082, y=0.965, ha="left",
+        fontsize=17, fontweight="bold", color=COLOR_TEXT_HEAD, x=0.075, y=0.965, ha="left",
     )
     ax.set_title(
-        "89 tasks · K=3 attempts · 87 measured under every condition",
-        fontsize=10, color=COLOR_MUTED, style="italic", pad=14, loc="left",
+        "89 tasks  ·  K=3 attempts  ·  87 measured under every condition",
+        fontsize=11, color=COLOR_TEXT_MUTED, style="italic", pad=18, loc="left",
     )
 
-    plt.subplots_adjust(left=0.08, right=0.97, top=0.88, bottom=0.16)
+    plt.subplots_adjust(left=0.075, right=0.97, top=0.86, bottom=0.16)
     out = ASSETS / "post-1-accuracy.png"
-    plt.savefig(out, dpi=144, facecolor="white")
+    plt.savefig(out, dpi=150, facecolor="white")
     print(f"Wrote {out}")
     return 0
 
