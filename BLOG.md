@@ -8,22 +8,24 @@ Pick any coding agent you might be using — *Cursor, Claude Code, Aider, OpenHa
 
 Each task starts from scratch. The agent works through the problem, makes mistakes, eventually finishes (or doesn't), and then everything it learned evaporates the moment the conversation ends.
 
-**For an individual developer this is mildly annoying:**
+There are partial fixes you've probably tried: longer context windows that let the agent see more within a single session; project-level rules files (Cursor's `.cursorrules`, Claude Code's `CLAUDE.md`, Aider conventions, etc.); RAG-style retrieval over your docs and codebase; persistent chat memory features built into the agent platform. These all help with what the agent *knows going into* a session. None of them help with what the agent *learned coming out of one* — that part still evaporates.
+
+**For an individual developer this is annoying:**
 
 - Your agent reaches for `pip` even though your repo has been on `uv` since spring — or for `jest` even though you migrated to `vitest` last quarter — every new session, same wrong tool, fresh
 - It re-proposes the dead-end approach you and your team explicitly rejected on Slack three weeks ago, because nothing in its context remembers any of that
 - You spend more time re-explaining the project's basics — *which logger, which test runner, which branch ships to prod, where the deploy script actually lives* — than you spend on the actual change you opened the chat for
 
-**For an engineering team it gets expensive fast:**
+**For an engineering team it's all of the above, multiplied across N engineers — plus a few more:**
 
 - Every engineer's agent runs through the same gotcha library independently
 - The skill your senior engineer's agent acquired last quarter does **not** transfer to the junior engineer's agent next quarter
 - Your humans build up institutional knowledge across PRs, postmortems, design reviews, and onboarding wikis — and there's no equivalent for agents
 - ***Your humans compound. Your agents do not.***
 
-This is the pattern we keep seeing in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks, keeps getting tripped up by the same things, and the next model upgrade doesn't move it past the plateau either.
+This is the pattern we keep seeing in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks and keeps getting tripped up by the same things. A bigger model would knock out some of those — but it wouldn't fix the underlying issue, which is that nothing carries from one session to the next.
 
-Of course it doesn't — there's no mechanism for it to.
+That structural part doesn't go away with a model upgrade. It goes away when the system starts remembering.
 
 **And throwing a bigger model at it doesn't help.** Frontier models can already chew through most Terminal-Bench 2.1 tasks if you give them enough tokens. Capability isn't the bottleneck. The bottleneck is that nothing about the *system around the model* carries yesterday's lesson into today.
 
@@ -31,7 +33,7 @@ What's missing is the five-line note your senior engineer would jot down after s
 
 ## What ContinuumAI does
 
-**ContinuumAI is the missing layer between agent sessions.** When a session ends, we look at what happened, pull out the lesson, and turn it into a short file the next session can read. No human in the middle, no manual curation.
+ContinuumAI is our attempt at giving agents memory across sessions — small enough to start as a hobby project, structured enough to grow into something a team can rely on. When a session ends, we read the trajectory, pull out the lesson that mattered most, and save it as a short file the next session can read. No human in the middle, no manual curation.
 
 Here's the loop:
 
@@ -44,14 +46,9 @@ flowchart LR
     E -. loaded at the start of<br/>the next related session .-> A
 ```
 
-Two LLM calls in, one Markdown file out. The library grows by one per session. A skill written at 11 p.m. on a Tuesday is loaded by your colleague's agent at 9 a.m. on Wednesday — and the file works the same whether your routing layer (*OpenRouter, Bedrock, direct provider*) sends the next request to GLM, Claude, or anything else.
+All in, that's two LLM calls and one Markdown file per session. The library grows by one each time. A skill written at 11 p.m. on a Tuesday is on disk by 9 a.m. Wednesday — ready for any teammate's agent to pick up. And the file behaves the same whether your routing layer (*OpenRouter, Bedrock, a direct provider*) hands the next request to GLM, Claude, or anything else.
 
-**What the loop is NOT:**
-
-- ❌ No model weights touched, no fine-tuning, no RL
-- ❌ No vector store, no embedding database
-- ❌ No human curation, no manual playbook maintenance
-- ❌ No vendor lock-in — skills are plain Markdown files in a folder
+A few things to be clear about what this loop *isn't*. Nothing here touches model weights, so there's no fine-tuning and no RL involved. There's no vector store, no embedding database. No human in the curation loop, no playbook to maintain by hand. And the skills are plain Markdown files in a folder — if you want to grep them, edit them, check them into git, or move them to a different platform tomorrow, you can.
 
 ## The compounding cost advantage
 
