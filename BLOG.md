@@ -8,7 +8,7 @@ Pick any coding agent you might be using — *Cursor, Claude Code, Aider, OpenHa
 
 Each task starts from scratch. The agent works through the problem, makes mistakes, eventually finishes (or doesn't), and then everything it learned evaporates the moment the conversation ends.
 
-There are partial fixes you've probably tried: longer context windows that let the agent see more within a single session; project-level rules files (Cursor's `.cursorrules`, Claude Code's `CLAUDE.md`, Aider conventions, etc.); RAG-style retrieval over your docs and codebase; persistent chat memory features built into the agent platform. These all help with what the agent *knows going into* a session. None of them help with what the agent *learned coming out of one* — that part still evaporates.
+There are partial fixes you've probably tried: longer context windows that let the agent see more within a single session; project-level rules files (Cursor's `.cursorrules`, Claude Code's `CLAUDE.md`, Aider conventions, etc.); RAG-style retrieval over your docs and codebase; persistent chat memory features built into the agent platform. All of them are ad-hoc — written by hand, maintained by hand, updated whenever a developer remembers to add the gotcha they just hit. The agent itself never contributes to any of them. Whatever it learns in a session evaporates the moment the chat ends, and the next session starts from whatever a human happened to write down yesterday.
 
 **For an individual developer this is annoying:**
 
