@@ -101,14 +101,6 @@ Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarter
 **⚠️ Some skills regress their target tasks.**
 A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
 
-## What's coming up
-
-Two more posts in this series, plus a methodology bonus dropping out of band:
-
-- **Post 2 — what this actually costs.** I'll put the per-attempt and per-passed-task dollars from this run next to what those same tasks would cost on Opus 4.8 at the same token usage. If the line item *"agent inference"* on your monthly bill matters, this is the post to wait for.
-- **Post 3 — what the skills actually look like.** I'll walk through a handful of individual SKILL.md files — the failure trajectories they came from, what each one teaches in plain English, why a couple of them regressed. Useful if you want to understand what skill-learning actually encodes (and what it doesn't).
-- **Bonus — the 65 % budget anomaly.** A methodology finding from this run that I think most teams haven't accounted for. If your team trusts or publishes agent benchmark numbers, you'll want this one before your next publication.
-
 ## References
 
 [1] Letta (2026). [*Skill Learning*](https://www.letta.com/blog/skill-learning).
