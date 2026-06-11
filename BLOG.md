@@ -23,7 +23,7 @@ There are partial fixes you've probably tried: longer context windows that let t
 - Your humans build up institutional knowledge across PRs, postmortems, design reviews, and onboarding wikis — and there's no equivalent for agents
 - ***Your humans compound. Your agents do not.***
 
-This is the pattern we keep seeing in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks and keeps getting tripped up by the same things. A bigger model would knock out some of those — but it wouldn't fix the underlying issue, which is that nothing carries from one session to the next.
+This is the recurring pattern in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks and keeps getting tripped up by the same things. A bigger model would knock out some of those — but it wouldn't fix the underlying issue, which is that nothing carries from one session to the next.
 
 That structural part doesn't go away with a model upgrade. It goes away when the system starts remembering.
 
@@ -33,7 +33,7 @@ What's missing is the five-line note your senior engineer would jot down after s
 
 ## What ContinuumAI does
 
-ContinuumAI is our attempt at giving agents memory across sessions. When a session ends, we read the trajectory, pull out the lesson that mattered most, and save it as a short file the next session can read. No human in the middle, no manual curation.
+ContinuumAI is an attempt at giving agents memory across sessions. When a session ends, the loop reads the trajectory, pulls out the lesson that mattered most, and saves it as a short file the next session can read. No human in the middle, no manual curation.
 
 Here's the loop:
 
@@ -50,21 +50,21 @@ While agents keep starting from zero, **every session is paying to rediscover th
 | Audience | What changes |
 |---|---|
 | **Individual developer** | An hour saved every time a repeated gotcha shows up; an agent that grows quietly sharper at *your* stack week after week |
-| **Engineering organization** | The monthly agent inference bill drops (we'll quantify this in Post 2). Institutional knowledge becomes something you can capture, replay, and audit — the same way commits are. And team-wide compounding starts kicking in across every PR. |
+| **Engineering organization** | The monthly agent inference bill drops (Post 2 will quantify this). Institutional knowledge becomes something you can capture, replay, and audit — the same way commits are. And team-wide compounding starts kicking in across every PR. |
 
 This is the unusual part: **the product gets more useful the longer you run it. No model upgrade required.**
 
 ## Measuring it on Terminal-Bench 2.1
 
-To measure the loop we needed a benchmark that:
+Picking the benchmark mattered. It needed to:
 
-1. **Tests multi-step, long-horizon agent work** — so a skill has real content to encode
-2. **Has a published frontier reference** — so any lift is interpretable
-3. **Allows clean K-run aggregation** — so the numbers are comparable across teams
+1. **Test multi-step, long-horizon agent work** — so a skill has real content to encode
+2. **Have a published frontier reference** — so any lift is interpretable
+3. **Allow clean K-run aggregation** — so the numbers are comparable across teams
 
 [Terminal-Bench 2.1](https://www.tbench.ai/leaderboard/terminal-bench/2.1) fits all three. 89 long-horizon coding and systems tasks: SQLite-WAL recovery, build-chain debugging, image-processing pipelines, reverse-engineering puzzles, network-protocol implementations, environment-configuration problems. Each task has a programmatic verifier. The current leaderboard top is *Codex CLI + GPT-5.5* at 83.4 %; second is *Claude Code + Opus 4.8* at **78.9 %**. Both run on frontier closed models.
 
-We ran the experiment with **GLM-5.1 as the executor** across three conditions:
+The experiment used **GLM-5.1 as the executor** across three conditions:
 
 - **A — baseline**: GLM-5.1 with no skill loaded
 - **B — GLM-authored skill**: GLM-5.1 reads a SKILL.md authored by GLM-5.1 from its own prior failure
@@ -83,11 +83,11 @@ K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured und
 
 ![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 %), C Opus-skill at 64.0 % (+4.6 %), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
 
-**+4.6 %** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
+**+4.6 %** is the headline. That's the result from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
 
-How does our +4.6 % compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 %** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 % to +25 %**, depending on the benchmark and how strict the gating is [2].
+How does this +4.6 % compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 %** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 % to +25 %**, depending on the benchmark and how strict the gating is [2].
 
-Our +4.6 % lands below both, which makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
+The +4.6 % lands below both, which makes sense — TB-2.1 is harder than TB-2.0, the loop here is simpler (no gate), and the executor is GLM-5.1 rather than a frontier closed model. What matters is the signal that the loop works at all on a hard benchmark with an open-weight executor — and it does.
 
 ### Two findings from the run worth flagging
 
@@ -95,11 +95,11 @@ Our +4.6 % lands below both, which makes sense — TB-2.1 is harder than TB-2.0,
 Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarters* of the lift that Opus-authoring (C) provides. The skill is the asset; the author is a multiplier on it, not a gate to it. What this means in practice:
 
 - Individual developers and small teams can run the whole loop on a cheap open-weight model — *no frontier API call required, ever*
-- Enterprises with privacy constraints have a defensible *"we don't have to send private trajectories to a frontier API"* answer
+- Enterprises with privacy constraints have a defensible *"no need to send private trajectories to a frontier API"* answer
 - The economics don't depend on any single model vendor staying cheap
 
 **⚠️ Some skills regress their target tasks.**
-A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
+A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and it should close most of the gap to the +9-to-+25 numbers reported in that literature.
 
 ## References
 
@@ -111,4 +111,4 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 The 4.6 % lift on Terminal-Bench 2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
 
-If you have one of those, come tell us about it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions).
+If you have one of those, share it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions).
