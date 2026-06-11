@@ -1,68 +1,42 @@
 # ContinuumAI
 
-**Solving the amnesiac problem for LLM agents.** ContinuumAI is the platform that captures the lesson from every agent session automatically, distills it into a short reusable skill file, and loads it before every related session that follows — across every developer on your team, every model in your routing layer, every quarter you keep running. No human curation step. No manual playbook maintenance. No fine-tuning. No RL. **First public measurement: +4.6 percentage points on Terminal-Bench 2.1** with an open-weight executor.
+**Solving amnesia for coding agents.** An open-weight stack with a learned-from-failure skill loop, measured at roughly **80 % of the top frontier model's score** on Terminal-Bench 2.1 — at a fraction of the inference cost.
 
-This repo is the first public release: a working aggregation of the experiment data, the loop, and a three-post series introducing the platform.
+## Read the launch post
 
-## The three-post series
+→ **[BLOG.md](BLOG.md)** — *AI agents are amnesiacs.*
+First post in a three-part series. Covers the amnesia problem, the skill-generation loop, the Terminal-Bench 2.1 measurement, and what comes next.
+
+## Headline result
+
+| Stack | TB-2.1 score | Lift |
+|---|---|---|
+| Claude Opus 4.8 (TB-2.1 leaderboard #2, frontier reference) | 78.9 % | — |
+| GLM-5.1 baseline (no skill) | 59.4 % | — |
+| GLM-5.1 + GLM-authored skill | 62.8 % | +3.4 % |
+| **GLM-5.1 + Opus-authored skill** | **64.0 %** | **+4.6 %** |
+
+89 long-horizon coding and systems tasks; K=3 attempts per task; 87 measured under every condition. Skills are generated only from failed runs, not from worked solutions — no solution leakage between skill authoring and measurement.
+
+## The series
 
 | Post | Topic | Status |
 |---|---|---|
-| **Post 1** | The amnesiac problem and an accuracy measurement on Terminal-Bench 2.1 | [Live → BLOG.md](BLOG.md) |
-| Post 2 | Per-attempt and per-passed-task cost economics — what changes when an open-weight executor + skills replaces a frontier closed model | Coming next |
-| Post 3 | Detailed case studies of individual skills that turned `pass^3 = 0` into `pass^3 = 1`, with full SKILL.md text and failure trajectories | Coming after Post 2 |
-| Bonus | A 65 % budget-anomaly methodology finding from the same run | Coming sooner, out of band |
+| **Post 1** | The amnesia problem and the accuracy measurement | **Live in [BLOG.md](BLOG.md)** |
+| Post 2 | Cost economics: per-attempt and per-passed-task dollars | Coming |
+| Post 3 | Inside individual SKILL.md files — what each one teaches, and the regression cases | Coming after Post 2 |
 
-## Headline result from Post 1
+## The mechanism in one paragraph
 
-89 tasks. K=3 attempts per task. TB-standard aggregated score. GLM-5.1 as the executor across three conditions:
-
-| Stack | TB-2.1 aggregated score | Lift vs baseline |
-|---|---|---|
-| Claude Opus 4.8 (TB-2.1 leaderboard #2, frontier reference) | 78.9 % | — |
-| **A**: GLM-5.1 baseline (no skill) | **59.4 %** | — |
-| **B**: GLM-5.1 + GLM-authored skill | **62.8 %** | **+3.4 pp** |
-| **C**: GLM-5.1 + Opus-authored skill | **64.0 %** | **+4.6 pp** |
-
-Author-model takeaway: self-authoring (B) captures about three-quarters of the lift that stronger-author (C) provides. The skill is the asset; the author is a multiplier, not a gate. Both individual developers running cheap open-weight models and engineering organizations with frontier API access can run the loop and see most of the lift either way.
-
-## Reproduce every number — two seconds
-
-This repository is self-contained:
-
-```bash
-git clone https://github.com/mrazakhan/ContinuumAI.git
-cd ContinuumAI
-python3 scripts/aggregate.py    # regenerates every headline number
-python3 scripts/plot.py         # regenerates the bar chart in BLOG.md
-```
-
-The aggregator reads [`data/raw-trials.json`](data/raw-trials.json) (699 per-trial records, ~230 KB — reward, token usage, per-trial cost) and writes [`data/canonical-results.json`](data/canonical-results.json) + [`data/canonical-results.md`](data/canonical-results.md). The plot script reads the canonical-results JSON and writes [`assets/post-1-accuracy.png`](assets/post-1-accuracy.png). Every number and figure in Post 1 reproduces exactly.
-
-## Repo layout
-
-| Path | Purpose |
-|---|---|
-| [`BLOG.md`](BLOG.md) | Post 1 — the amnesiac problem and the Terminal-Bench 2.1 measurement |
-| [`scripts/aggregate.py`](scripts/aggregate.py) | Single deterministic aggregation script — source of truth for every number |
-| [`scripts/plot.py`](scripts/plot.py) | Regenerates the BLOG.md bar chart from `canonical-results.json` |
-| [`data/raw-trials.json`](data/raw-trials.json) | 699 per-trial records (reward + token usage + cost) |
-| [`data/canonical-results.json`](data/canonical-results.json) | Machine-readable script output |
-| [`data/canonical-results.md`](data/canonical-results.md) | Human-readable summary |
-| [`assets/post-1-accuracy.png`](assets/post-1-accuracy.png) | The bar chart embedded in Post 1 |
-
-## The continuity loop in a paragraph
-
-Each agent session that fails leaves behind a *failure trajectory* — the verbatim record of what the agent tried, observed, and gave up on. A two-stage Reflector → SkillCreator pipeline reads that trajectory and produces a single Markdown SKILL.md file: a short, mechanical lesson the next session loads at run time. The agent does not *remember*; the skill library does. The library grows with every failure, and the same skill works for any model on the same task. The Terminal-Bench 2.1 result above is the first measurement that this loop works on a hard benchmark, with an open-weight executor. Full mechanism described in [BLOG.md](BLOG.md).
+After each agent session ends, a Reflector LLM call reads the session trajectory and extracts the single load-bearing lesson from the failure. A SkillCreator LLM call writes that lesson as a short Markdown file (SKILL.md). The next related session loads the file before starting. The library grows by one per session — no model weights touched, no fine-tuning, no RL, no vector store, no human curation step. Skills are plain Markdown files that work with any model your routing layer (OpenRouter, AWS Bedrock, a direct provider) hands the next request to.
 
 ## Get in touch
 
-Open a thread in **[Discussions](https://github.com/mrazakhan/ContinuumAI/discussions)** — relevant for both audiences:
+Open a thread in **[Discussions](https://github.com/mrazakhan/ContinuumAI/discussions)** if any of the following sound like your stack:
 
-- **Individual developers** tired of re-explaining the same gotchas to the same agent every Tuesday
-- **Engineering organizations** running pilots that plateaued at "still rediscovering the same skills six months in"
-- **Benchmark maintainers** interested in adding their benchmark to a forthcoming multi-benchmark cost-aware leaderboard
-- **Anyone publishing or trusting agent benchmark numbers** — the bonus methodology post on the 65 % budget anomaly is highly relevant; happy to share the recovery script directly
+- An individual developer tired of re-explaining the same gotchas to the same agent every Tuesday
+- An engineering organization running a pilot that plateaued at *"still rediscovering the same skills six months in"*
+- A team that publishes or trusts agent benchmark numbers (worth a separate conversation on measurement methodology)
 
 ## License
 
