@@ -101,22 +101,6 @@ Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarter
 **⚠️ Some skills regress their target tasks.**
 A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and we expect it to close most of the gap to the +9-to-+25 numbers reported in that literature.
 
-## Our north star
-
-The agent we're trying to build is the one that's *yours*. Not generic, not whatever some model vendor trained on the public internet — but an agent whose value comes from accumulating the specific knowledge of your codebase, your team, your past failures. One that gets sharper every quarter without anyone retraining anything.
-
-To get there, the system needs:
-
-- ✅ A **persistent, accumulating skill library**, scoped per-project, per-team, per-org *(first version shipped)*
-- ✅ **Automatic capture from every session** — not opt-in, not manual *(covered above)*
-- 🚧 **Validation-gated skill acceptance** so the library never regresses *(next iteration)*
-- ✅ **Cross-model transferability** so skill investments survive model upgrades *(by design — quantified in Post 2)*
-- 🚧 **Per-team and per-org scoping with access controls** *(in design — for the enterprise rollout)*
-
-The +4.6-point lift on TB-2.1 is the first public sign that the loop works. The one we actually care about is what happens *quarter over quarter* in a team running this in production — lessons compound, one engineer's hard-won debug session bootstraps every other engineer's agent, and the system gets more valuable in a direction that has nothing to do with the next model release.
-
-That's what we're building toward.
-
 ## What's coming up
 
 Two more posts in this series, plus a methodology bonus dropping out of band:
