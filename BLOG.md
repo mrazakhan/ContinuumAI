@@ -107,8 +107,8 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 [2] Microsoft Research (2026). [*SkillOpt: Optimizing Natural-Language Skills as the Trainable State of Frozen Agents*](https://microsoft.github.io/SkillOpt/). [arXiv:2605.23904](https://arxiv.org/abs/2605.23904).
 
-## What's next
+## Conclusion
 
-**Post 2** will cover the cost side of this experiment: per-attempt and per-passed-task dollars from the same run, set against what those tasks would cost on a frontier closed model at the same token usage.
+An automatic skill-generation loop like this one — no model weights touched, no human curation, one short Markdown file per failed session — takes an open-weight executor to roughly **80 % of the top frontier model's score** on Terminal-Bench 2.1 (64.0 % vs 78.9 %), at a fraction of the inference cost.
 
-**Post 3** will go inside individual SKILL.md files — what each one teaches, the failure trajectory that produced it, and the cases where the loop wrote a skill that hurt instead of helping.
+More details on the cost side in **Post 2**. **Post 3** walks through individual SKILL.md files — what each one teaches, the failure trajectory that produced it, and the cases where the loop wrote a skill that hurt instead of helping.
