@@ -83,12 +83,11 @@ K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured und
 
 ![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 pp), C Opus-skill at 64.0 % (+4.6 pp), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
 
-**+4.6 points** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard. For context, published results in this research area have reported:
+**+4.6 points** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
 
-- **+9 points** for trajectory-only approaches on the easier predecessor benchmark (TB-2.0) [1]
-- **+9 to +25 points** for iterative-gated approaches on broader benchmark suites (search QA, spreadsheets, ALFWorld), depending on benchmark and gating strictness [2]
+How does +4.6 compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 points** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 to +25 points**, depending on the benchmark and how strict the gating is [2].
 
-Our +4.6 lands below both. That makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
+Our +4.6 lands below both, which makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
 
 ### Two findings from the run worth flagging
 
