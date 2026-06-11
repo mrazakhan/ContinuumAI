@@ -83,11 +83,9 @@ K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured und
 
 ![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 %), C Opus-skill at 64.0 % (+4.6 %), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
 
-**+4.6 %** is the headline. That's the result from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
+**+4.6 %** is the headline — from one failure trajectory per task, no refinement loop, no validation gate, on a benchmark this hard.
 
-How does this +4.6 % compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 %** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 % to +25 %**, depending on the benchmark and how strict the gating is [2].
-
-The +4.6 % lands below both, which makes sense — TB-2.1 is harder than TB-2.0, the loop here is simpler (no gate), and the executor is GLM-5.1 rather than a frontier closed model. What matters is the signal that the loop works at all on a hard benchmark with an open-weight executor — and it does.
+There's clear room to push that number higher. The loop here is the simplest version of itself by design, and several refinements are already queued up for the next iterations — validation gating chief among them. What matters at this point is the signal that the loop works at all on a hard benchmark with an open-weight executor, and it does.
 
 ### Two findings from the run worth flagging
 
@@ -99,7 +97,7 @@ Self-authoring (GLM-5.1 writing its own skills, B) captures *about three-quarter
 - The economics don't depend on any single model vendor staying cheap
 
 **⚠️ Some skills regress their target tasks.**
-A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and it should close most of the gap to the +9-to-+25 numbers reported in that literature.
+A handful of tasks where the unaided baseline already passed 2 of 3 attempts ended up passing only 1 of 3 once a skill was loaded. The current loop ships every skill the author produces — *no validation gate yet* — so this is the expected hiccup of the simplest version. Adding the gate (the iterative-refinement approach in [2]) is the next iteration, and it should knock most of these regressions out.
 
 ## References
 
@@ -107,8 +105,8 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 [2] Microsoft Research (2026). [*SkillOpt: Optimizing Natural-Language Skills as the Trainable State of Frozen Agents*](https://microsoft.github.io/SkillOpt/). [arXiv:2605.23904](https://arxiv.org/abs/2605.23904).
 
-## Closing
+## What's next
 
-The 4.6 % lift on Terminal-Bench 2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
+**Post 2** will cover the cost side of this experiment: per-attempt and per-passed-task dollars from the same run, set against what those tasks would cost on a frontier closed model at the same token usage.
 
-If you have one of those, share it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions).
+**Post 3** will go inside individual SKILL.md files — what each one teaches, the failure trajectory that produced it, and the cases where the loop wrote a skill that hurt instead of helping.
