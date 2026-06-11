@@ -78,16 +78,16 @@ K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured und
 |---|---|---|
 | Claude Opus 4.8 (leaderboard #2) | 78.9 % | *frontier reference* |
 | **A**: GLM-5.1 baseline (no skill) | **59.4 %** | — |
-| **B**: GLM-5.1 + GLM-authored skill | **62.8 %** | **+3.4 pp** |
-| **C**: GLM-5.1 + Opus-authored skill | **64.0 %** | **+4.6 pp** |
+| **B**: GLM-5.1 + GLM-authored skill | **62.8 %** | **+3.4 %** |
+| **C**: GLM-5.1 + Opus-authored skill | **64.0 %** | **+4.6 %** |
 
-![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 pp), C Opus-skill at 64.0 % (+4.6 pp), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
+![Terminal-Bench 2.1 aggregated score by condition: A baseline at 59.4 %, B GLM-skill at 62.8 % (+3.4 %), C Opus-skill at 64.0 % (+4.6 %), and Claude Opus 4.8 frontier reference at 78.9 %.](assets/post-1-accuracy.png)
 
-**+4.6 points** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
+**+4.6 %** is the headline. That's what we got from one failure trajectory per task, with no refinement loop and no validation gate, on a benchmark this hard.
 
-How does +4.6 compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 points** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 to +25 points**, depending on the benchmark and how strict the gating is [2].
+How does our +4.6 % compare to what's been published? Trajectory-only approaches on the easier predecessor benchmark (TB-2.0) have come in around **+9 %** [1]. Iterative-gated approaches on broader benchmark suites — search QA, spreadsheets, ALFWorld — have reported anywhere from **+9 % to +25 %**, depending on the benchmark and how strict the gating is [2].
 
-Our +4.6 lands below both, which makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
+Our +4.6 % lands below both, which makes sense — TB-2.1 is harder than TB-2.0, our loop is simpler (no gate), and we're running GLM-5.1 instead of a frontier closed model. The signal we wanted was that the loop works at all on a hard benchmark with an open-weight executor — and it does.
 
 ### Two findings from the run worth flagging
 
@@ -109,6 +109,6 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 ## Closing
 
-The 4.6 percent lift on Terminal-Bench 2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
+The 4.6 % lift on Terminal-Bench 2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
 
 If you have one of those, come tell us about it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions).

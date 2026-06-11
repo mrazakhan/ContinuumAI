@@ -103,7 +103,7 @@ def main() -> int:
     for i in (1, 2):
         delta = values[i] - baseline_val
         ax.annotate(
-            f"+{delta:.1f} pp",
+            f"+{delta:.1f} %",
             xy=(i, values[i] + 6.5),
             ha="center", va="bottom",
             fontsize=10.5, color="white", fontweight="600",
