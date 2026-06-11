@@ -41,7 +41,7 @@ Here's the loop:
 
 ![The skill-generation loop: each agent session ends, the trajectory is captured, the Reflector extracts the single load-bearing insight, the SkillCreator writes a short SKILL.md file, the skill library grows by one, and the new skill is loaded at the start of the next related session.](assets/post-1-loop.png)
 
-Each session adds one short Markdown file to the library. No model weights touched, no vector store, no human curation step — just plain text in a folder you can grep, version in git, or move to a different platform whenever you want.
+Each entry in the library is a short, portable Markdown file — readable, editable, version-controllable with git, and easy to move to a different platform whenever you want. The pipeline itself stays minimal: the underlying model isn't fine-tuned, there's no embedding store running alongside it, and no human reviews each new addition before it goes in.
 
 ## The compounding cost advantage
 
