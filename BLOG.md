@@ -21,7 +21,7 @@ There are partial fixes you've probably tried: longer context windows that let t
 - Every engineer's agent runs through the same gotcha library independently
 - The skill your senior engineer's agent acquired last quarter does **not** transfer to the junior engineer's agent next quarter
 - Your humans build up institutional knowledge across PRs, postmortems, design reviews, and onboarding wikis — and there's no equivalent for agents
-- ***Your humans compound. Your agents do not.***
+- ***Human knowledge compounds, but agentic knowledge does not.***
 
 This is the recurring pattern in agent pilots: useful out of the gate, then a plateau that never quite breaks. The agent keeps doing the same tasks and keeps getting tripped up by the same things. A bigger model would knock out some of those — but it wouldn't fix the underlying issue, which is that nothing carries from one session to the next.
 
