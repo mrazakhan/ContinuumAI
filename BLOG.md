@@ -72,6 +72,8 @@ The experiment used **GLM-5.1 as the executor** across three conditions:
 - **B — GLM-authored skill**: GLM-5.1 reads a SKILL.md authored by GLM-5.1 from its own prior failure
 - **C — Opus-authored skill**: GLM-5.1 reads a SKILL.md authored by Claude Opus 4.6 from the same prior failure
 
+**One important methodology note.** Skill generation and results measurement happen on the same task set, but **skills are generated only from failed runs** — never from a passing solution. The SKILL.md captures the lesson from a wrong attempt (the one decision that, if known going in, would have changed the outcome), not the worked answer to the task. The agent at test time sees a hint about what went wrong before, not an answer key. There is no solution-leakage from the skill-authoring side into the measurement side.
+
 K=3 attempts per task. TB-standard aggregated score. 87 of 89 tasks measured under every condition.
 
 ### Results
