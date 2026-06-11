@@ -29,15 +29,3 @@ First post in a three-part series. Covers the amnesia problem, the skill-generat
 ## The mechanism in one paragraph
 
 After each agent session ends, a Reflector LLM call reads the session trajectory and extracts the single load-bearing lesson from the failure. A SkillCreator LLM call writes that lesson as a short Markdown file (SKILL.md). The next related session loads the file before starting. The library grows by one per session — no model weights touched, no fine-tuning, no RL, no vector store, no human curation step. Skills are plain Markdown files that work with any model your routing layer (OpenRouter, AWS Bedrock, a direct provider) hands the next request to.
-
-## Get in touch
-
-Open a thread in **[Discussions](https://github.com/mrazakhan/ContinuumAI/discussions)** if any of the following sound like your stack:
-
-- An individual developer tired of re-explaining the same gotchas to the same agent every Tuesday
-- An engineering organization running a pilot that plateaued at *"still rediscovering the same skills six months in"*
-- A team that publishes or trusts agent benchmark numbers (worth a separate conversation on measurement methodology)
-
-## License
-
-Apache 2.0.
