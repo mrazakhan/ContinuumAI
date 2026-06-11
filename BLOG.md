@@ -137,8 +137,9 @@ Two more posts in this series, plus a methodology bonus dropping out of band:
 
 ## References
 
-[1] *Skill Learning* — Letta, 2026. https://www.letta.com/blog/skill-learning
-[2] *SkillOpt: Optimizing Natural-Language Skills as the Trainable State of Frozen Agents* — Microsoft Research, 2026. https://microsoft.github.io/SkillOpt/ · paper: https://arxiv.org/abs/2605.23904
+[1] Letta (2026). [*Skill Learning*](https://www.letta.com/blog/skill-learning).
+
+[2] Microsoft Research (2026). [*SkillOpt: Optimizing Natural-Language Skills as the Trainable State of Frozen Agents*](https://microsoft.github.io/SkillOpt/). [arXiv:2605.23904](https://arxiv.org/abs/2605.23904).
 
 ## Closing
 
