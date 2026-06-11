@@ -109,8 +109,6 @@ A handful of tasks where the unaided baseline already passed 2 of 3 attempts end
 
 ## Closing
 
-The amnesiac problem isn't a curiosity. It's one of the biggest reasons agent pilots quietly stall — the agents are useful at first, then they plateau. They never become *the senior engineer's agent that's been in the trenches*. They stay junior forever.
+The +4.6 on TB-2.1 is one measurement. The interesting one is what happens when the loop runs against the things you and your team end up rediscovering every week — the conventions, the gotchas, the build-environment quirks that nobody's written down because nobody owns the rules file.
 
-That's what ContinuumAI is built to change. Skills accumulate — across every developer on your team, every model in your routing layer, every quarter the system runs. The agent gets noticeably better at *your* stack every time anyone on your team uses it.
-
-If you're an individual developer tired of re-explaining the same gotchas, or an engineering leader watching the same skill rediscover itself across every engineer's session, come open a thread in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions) and tell us what you're running. We're particularly interested in cases where the same gotcha keeps surfacing across team members — those are the highest-value places to drop a skill, and they're exactly the workloads the next iteration of the loop is being designed around.
+If you have one of those, come tell us about it in [Discussions](https://github.com/mrazakhan/ContinuumAI/discussions). That's the conversation we want to be having.
