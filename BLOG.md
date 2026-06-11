@@ -39,9 +39,7 @@ Here's the loop:
 
 ![The skill-generation loop: each agent session ends, the trajectory is captured, the Reflector extracts the single load-bearing insight, the SkillCreator writes a short SKILL.md file, the skill library grows by one, and the new skill is loaded at the start of the next related session.](assets/post-1-loop.png)
 
-All in, that's two LLM calls and one Markdown file per session. The library grows by one each time. A skill written at 11 p.m. on a Tuesday is on disk by 9 a.m. Wednesday — ready for any teammate's agent to pick up. And the file behaves the same whether your routing layer (*OpenRouter, Bedrock, a direct provider*) hands the next request to GLM, Claude, or anything else.
-
-A few things to be clear about what this loop *isn't*. Nothing here touches model weights, so there's no fine-tuning and no RL involved. There's no vector store, no embedding database. No human in the curation loop, no playbook to maintain by hand. And the skills are plain Markdown files in a folder — if you want to grep them, edit them, check them into git, or move them to a different platform tomorrow, you can.
+Each session adds one short Markdown file to the library. No model weights touched, no vector store, no human curation step — just plain text in a folder you can grep, version in git, or move to a different platform whenever you want.
 
 ## The compounding cost advantage
 
