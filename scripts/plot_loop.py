@@ -54,8 +54,8 @@ COLOR_LOOP_ARROW     = "#64748b"   # slate-500   -- dashed, slightly lighter
 NODES = [
     (1.2,  "Agent session ends",      "pass or fail",                 "neutral"),
     (4.0,  "Trajectory captured",     "commands · observations",      "artifact"),
-    (6.9,  "Reflector LLM",           "extracts the single\nload-bearing insight",  "llm"),
-    (10.0, "SkillCreator LLM",        "writes a short\nSKILL.md file","llm"),
+    (6.9,  "Reflector",               "extracts the single\nload-bearing insight",  "llm"),
+    (10.0, "SkillCreator",            "writes a short\nSKILL.md file","llm"),
     (12.8, "Skill library",           "+1 skill on disk",             "store"),
 ]
 

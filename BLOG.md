@@ -37,7 +37,7 @@ ContinuumAI is our attempt at giving agents memory across sessions. When a sessi
 
 Here's the loop:
 
-![The skill-generation loop: each agent session ends, the trajectory is captured, a Reflector LLM extracts the single load-bearing insight, a SkillCreator LLM writes a short SKILL.md file, the skill library grows by one, and the new skill is loaded at the start of the next related session.](assets/post-1-loop.png)
+![The skill-generation loop: each agent session ends, the trajectory is captured, the Reflector extracts the single load-bearing insight, the SkillCreator writes a short SKILL.md file, the skill library grows by one, and the new skill is loaded at the start of the next related session.](assets/post-1-loop.png)
 
 All in, that's two LLM calls and one Markdown file per session. The library grows by one each time. A skill written at 11 p.m. on a Tuesday is on disk by 9 a.m. Wednesday — ready for any teammate's agent to pick up. And the file behaves the same whether your routing layer (*OpenRouter, Bedrock, a direct provider*) hands the next request to GLM, Claude, or anything else.
 
